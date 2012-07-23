@@ -2,6 +2,8 @@
 
 from PIL import Image
 
+from config import SAMPLE_COUNT, DIFF
+
 
 def _open_image(filename, size):
     ret = Image.open(filename)
@@ -25,9 +27,6 @@ def _convert(image, color_count):
 
 
 def _get_colors(image, color_count, is_hex=False):
-    SAMPLE_COUNT = 125
-    DIFF = 50
-
     def __distance(sample, control_group):
         def __cal(a, b):
             ret = 0
