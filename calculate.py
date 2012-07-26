@@ -7,10 +7,18 @@ from config import SAMPLE_COUNT, DIFF
 from color import rgb2lab, deltaE
 
 
-def _open_image(filename, size):
+def _open_image(filename):
     ret = Image.open(filename)
-    ret.thumbnail(size, Image.ANTIALIAS)
     return ret
+
+
+def _thumbnail(image, size):
+    image.thumbnail(size, Image.ANTIALIAS)
+    return image
+
+
+def _resize(image, size):
+    return image.resize(size, Image.ANTIALIAS)
 
 
 def _save_image(image, filename):
@@ -28,7 +36,7 @@ def _convert(image):
             palette=Image.ADAPTIVE, colors=SAMPLE_COUNT)
 
 
-def _get_colors(image, color_count, is_hex=False):
+def _get_colors(image, color_count):
     def __compare(sample, control_group):
         def is_notice(a, b):
             lab_a = rgb2lab(a[0], a[1], a[2])
@@ -44,9 +52,6 @@ def _get_colors(image, color_count, is_hex=False):
         while l:
             yield [l.pop(0) for i in xrange(3)]
 
-    def __hex(l):
-        return "#%02x%02x%02x" % (l[0], l[1], l[2])
-
     payload = image.getpalette()[0:SAMPLE_COUNT * 3]
     ret = []
     for i in __pop(payload):
@@ -56,9 +61,5 @@ def _get_colors(image, color_count, is_hex=False):
             ret.append((i[0], i[1], i[2]))
         if len(ret) == color_count:
             break
-
-    if is_hex:
-        for i in xrange(len(ret)):
-            ret[i] = __hex(ret[i])
 
     return ret
