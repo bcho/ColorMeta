@@ -4,6 +4,8 @@ from PIL import Image
 
 from config import SAMPLE_COUNT, DIFF
 
+from color import rgb2lab, deltaE
+
 
 def _open_image(filename, size):
     ret = Image.open(filename)
@@ -15,27 +17,26 @@ def _save_image(image, filename):
     image.save(filename)
 
 
-def _convert(image, color_count):
+def _convert(image):
     try:
         return image.convert('P',
-            palette=Image.ADAPTIVE, colors=color_count)
+            palette=Image.ADAPTIVE, colors=SAMPLE_COUNT)
     except:
         # convert to RGB mode (without changing transparent to white)
         image = image.convert('RGB')
         return image.convert('P',
-            palette=Image.ADAPTIVE, colors=color_count)
+            palette=Image.ADAPTIVE, colors=SAMPLE_COUNT)
 
 
 def _get_colors(image, color_count, is_hex=False):
-    def __distance(sample, control_group):
-        def __cal(a, b):
-            ret = 0
-            for i in zip(a, b):
-                ret += (i[0] - i[1]) ** 2
-            return ret ** 0.5
+    def __compare(sample, control_group):
+        def is_notice(a, b):
+            lab_a = rgb2lab(a[0], a[1], a[2])
+            lab_b = rgb2lab(b[0], b[1], b[2])
+            return deltaE(lab_a, lab_b) < DIFF
 
-        for c in control_group:
-            if __cal(sample, c) <= DIFF:
+        for color in control_group:
+            if is_notice(sample, color):
                 return False
         return True
 
@@ -49,7 +50,7 @@ def _get_colors(image, color_count, is_hex=False):
     payload = image.getpalette()[0:SAMPLE_COUNT * 3]
     ret = []
     for i in __pop(payload):
-        if not __distance(i, ret):
+        if not __compare(i, ret):
             continue
         else:
             ret.append((i[0], i[1], i[2]))
