@@ -3,14 +3,17 @@
 from PIL import Image
 
 from color import rgb2lab, rgb2hex, deltaE
-from config import DIFF, PALETTE_SAMPLE, THUMBANIL_SIZE
 
 
 class MetaImage(object):
+    diff = 15
+    thumbnail_size = 100, 100
+    palette_sample = 256
+
     '''Provide a Image proxy object with handful function.'''
     def __init__(self, name):
         self._image = Image.open(name)
-        self.thumbnail(THUMBANIL_SIZE)
+        self.thumbnail(self.thumbnail_size)
         self.convert()
 
     def thumbnail(self, size):
@@ -25,12 +28,12 @@ class MetaImage(object):
     def convert(self):
         try:
             self._image = self._image.convert('P', palette=Image.ADAPTIVE,
-                    colors=PALETTE_SAMPLE)
+                    colors=self.palette_sample)
         except:
             # convert to RGB mode (without changing transparent to white)
             self._image = self._image.convert('RGB')
             self._image = self._image.convert('P', palette=Image.ADAPTIVE,
-                    colors=PALETTE_SAMPLE)
+                    colors=self.palette_sample)
 
     def colors(self, maximum=5):
         pass
@@ -47,7 +50,7 @@ class QuanImage(MetaImage):
     def colors(self, maximum=5):
         def _cmp(current, picked):
             def is_notice(b):
-                return deltaE(rgb2lab(*current), rgb2lab(*b)) < DIFF
+                return deltaE(rgb2lab(*current), rgb2lab(*b)) < self.diff
 
             return not any(map(is_notice, picked))
 
@@ -73,7 +76,7 @@ class PixelImage(MetaImage):
     def colors(self, maximum=5):
         def _cmp(current, picked):
             def is_notice(b):
-                return deltaE(rgb2lab(*current), rgb2lab(*b)) < DIFF
+                return deltaE(rgb2lab(*current), rgb2lab(*b)) < self.diff
 
             return not any(map(is_notice, picked))
 
