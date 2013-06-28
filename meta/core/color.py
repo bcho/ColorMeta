@@ -25,7 +25,7 @@ def rgb2xyz(r, g, b):
 def xyz2lab(x, y, z):
     # CIE XYZ REC 709 to CIE L*ab
     # http://www.easyrgb.com/index.php?X=MATH&H=07#text7
-    ref = (96.4221, 100.000, 82.5221)
+    ref = (95.047, 100.000, 108.883)
 
     def _xyz(c, ref_c):
         percentage = c / ref_c
