@@ -54,6 +54,14 @@ def rgb2hex(r, g, b, leading='#'):
     return '%s%02x%02x%02x' % (leading, r, g, b)
 
 
+def hex2rgb(hexcode, leading='#'):
+    hexcode = hexcode.split(leading)[-1]
+    if len(hexcode) < 6:
+        return (0, 0, 0)
+    _ = lambda x: int(x, base=16)
+    return _(hexcode[0:2]), _(hexcode[2:4]), _(hexcode[4:6])
+
+
 def deltaE(a, b):
     # Delta E CIE76
     # http://en.wikipedia.org/wiki/Color_difference#Delta_E

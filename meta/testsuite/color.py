@@ -13,6 +13,12 @@ class ColorTestCase(MetaTestCase):
         self.assertEqual('#cb3f20', color.rgb2hex(203, 63, 32))
         self.assertEqual('#ffffff', color.rgb2hex(255, 255, 255))
 
+    def test_hex2rgb(self):
+        self.assertEqual((0, 0, 0), color.hex2rgb('#000000'))
+        self.assertEqual((255, 255, 255), color.hex2rgb('#ffffff'))
+        self.assertEqual((203, 63, 32), color.hex2rgb('#cb3f20'))
+        self.assertEqual((16, 0, 0), color.hex2rgb('100000'))
+
     def test_rgb2xyz(self):
         x, y, z = color.rgb2xyz(203, 63, 32)
         self.assertEqualFloat(x, 26.667)
